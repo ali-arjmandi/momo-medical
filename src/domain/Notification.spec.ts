@@ -122,24 +122,99 @@ describe('Notification', () => {
   });
 
   describe('sendSignals', () => {
-    it('should send signals for all UserDevices', () => {
-      throw Error('Not implemented');
+    it('should send signals for all UserDevices', async () => {
+      const device1 = new UserDevice(true);
+      const device2 = new UserDevice(true);
+      const device3 = new UserDevice(true);
+      const user1 = new User('user-1', ['Ward 1'], [device1, device2]);
+      const user2 = new User('user-2', ['Ward 1'], [device3]);
+
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [user1, user2],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      await testNotification.sendSignals();
+
+      expect(signalSender.sendSignal).toHaveBeenCalledTimes(1);
+      expect(signalSender.sendSignal).toHaveBeenCalledWith(
+        `Notification for bed ${testBed.name} in ${testBed.ward}`,
+        [device1, device2, device3],
+      );
     });
 
-    it('should send no signals when the Organization has notifications disabled', () => {
-      throw Error('Not implemented');
+    it('should send no signals when the Organization has notifications disabled', async () => {
+      const disabledOrganization = new Organization('organization-1', false);
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: disabledOrganization,
+        bed: testBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      await testNotification.sendSignals();
+
+      expect(signalSender.sendSignal).not.toHaveBeenCalled();
     });
 
-    it('should send no signals when notifications are turned off for the Bed', () => {
-      throw Error('Not implemented');
+    it('should send no signals when notifications are turned off for the Bed', async () => {
+      const disabledBed = new Bed('bed-1', 'Bed 1', 'Ward 1', false);
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: disabledBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      await testNotification.sendSignals();
+
+      expect(signalSender.sendSignal).not.toHaveBeenCalled();
     });
 
-    it('should send no signals when a User has disabled the ward', () => {
-      throw Error('Not implemented');
+    it('should send no signals when a User has disabled the ward', async () => {
+      const userWithDisabledWard = new User('user-1', ['Ward 2'], [testUserDevice]);
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [userWithDisabledWard],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      await testNotification.sendSignals();
+
+      expect(signalSender.sendSignal).not.toHaveBeenCalled();
     });
 
-    it('should send no signals when notifications are turned off for a UserDevice', () => {
-      throw Error('Not implemented');
+    it('should send no signals when notifications are turned off for a UserDevice', async () => {
+      const disabledDevice = new UserDevice(false);
+      const userWithDisabledDevice = new User('user-1', ['Ward 1'], [disabledDevice]);
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [userWithDisabledDevice],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      await testNotification.sendSignals();
+
+      expect(signalSender.sendSignal).not.toHaveBeenCalled();
     });
   });
 
