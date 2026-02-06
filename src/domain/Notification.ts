@@ -1,11 +1,11 @@
 import { AutoConfirmation } from './AutoConfirmation';
 import { type Bed } from './Bed';
-import { type IPublisher } from './IPublisher';
-import { type ISignalSender } from './ISignalSender';
 import { type LocationEvent } from './LocationEvent';
 import { type Organisation } from './Organisation';
 import { type User } from './User';
 import { UserConfirmation } from './UserConfirmation';
+import { type IPublisher } from '../infrastructure/services/IPublisher';
+import { type ISignalSender } from '../infrastructure/services/ISignalSender';
 
 interface NotificationParams {
   id: string;

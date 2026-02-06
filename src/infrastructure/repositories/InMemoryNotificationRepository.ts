@@ -1,6 +1,6 @@
 import { INotificationRepository } from './INotificationRepository';
-import { Notification } from './Notification';
-import { NotificationNotFoundError } from './NotificationNotFoundError';
+import { Notification } from '../../domain/Notification';
+import { NotificationNotFoundError } from '../../domain/NotificationNotFoundError';
 
 export class InMemoryNotificationRepository implements INotificationRepository {
   private notifications: Map<string, Notification> = new Map();

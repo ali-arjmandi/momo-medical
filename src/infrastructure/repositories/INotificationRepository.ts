@@ -1,4 +1,4 @@
-import { Notification } from '../domain';
+import { Notification } from '../../domain/Notification';
 
 export interface INotificationRepository {
   list(): Promise<Notification[]>;

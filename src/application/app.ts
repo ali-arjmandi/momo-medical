@@ -1,5 +1,5 @@
 import express from 'express';
-import { INotificationRepository } from './INotificationRepository';
+import { INotificationRepository } from '../infrastructure/repositories/INotificationRepository';
 
 interface ApplicationParameters {
   notificationRepository: INotificationRepository;

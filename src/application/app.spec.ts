@@ -1,12 +1,12 @@
 import request from 'supertest';
 import { createApp } from './app';
-import { Bed } from './Bed';
-import { InMemoryNotificationRepository } from './InMemoryNotificationRepository';
-import { LocationEvent } from './LocationEvent';
-import { Notification } from './Notification';
-import { Organisation } from './Organisation';
-import { User } from './User';
-import { UserDevice } from './UserDevice';
+import { Bed } from '../domain/Bed';
+import { InMemoryNotificationRepository } from '../infrastructure/repositories/InMemoryNotificationRepository';
+import { LocationEvent } from '../domain/LocationEvent';
+import { Notification } from '../domain/Notification';
+import { Organisation } from '../domain/Organisation';
+import { User } from '../domain/User';
+import { UserDevice } from '../domain/UserDevice';
 
 describe('app', () => {
   const testOrganisation = new Organisation('organisation-1', true);
