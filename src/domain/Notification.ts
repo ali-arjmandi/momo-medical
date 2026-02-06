@@ -5,7 +5,7 @@ import { type Organization } from './Organization';
 import { type User } from './User';
 import { type UserDevice } from './UserDevice';
 import { UserConfirmation } from './UserConfirmation';
-import { UserNotFoundError } from './errors';
+import { EventSourceMismatchError, UserNotFoundError } from './errors';
 import { type IPublisher } from '../infrastructure/services/IPublisher';
 import { type ISignalSender } from '../infrastructure/services/ISignalSender';
 
@@ -148,6 +148,18 @@ export class Notification {
     return userConfirmation;
   }
 
-  // @ts-expect-error Remove this once the method is implemented
-  confirmForEvent(_event: LocationEvent): AutoConfirmation {}
+  confirmForEvent(event: LocationEvent): AutoConfirmation {
+    if (event.source !== this.event.source) {
+      throw new EventSourceMismatchError(this.event.source, event.source);
+    }
+
+    if (this.autoConfirmation) {
+      return this.autoConfirmation;
+    }
+
+    const autoConfirmation = new AutoConfirmation(new Date(), event);
+    this.autoConfirmation = autoConfirmation;
+
+    return autoConfirmation;
+  }
 }
