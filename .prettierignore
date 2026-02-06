@@ -1,0 +1,7 @@
+# Ignore Artifacts
+dist
+node_modules
+coverage
+cdk.out
+.yarn
+docs/openapi.html

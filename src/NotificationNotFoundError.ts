@@ -1,0 +1,1 @@
+class NotificationNotFoundError extends Error {}
