@@ -6,6 +6,7 @@ import { Organization } from './Organization';
 import { User } from './User';
 import { UserConfirmation } from './UserConfirmation';
 import { UserDevice } from './UserDevice';
+import { UserNotFoundError } from './errors';
 
 describe('Notification', () => {
   const testOrganization = new Organization('organization-1', true);
@@ -248,11 +249,50 @@ describe('Notification', () => {
 
   describe('confirmForUser', () => {
     it('should create a new UserConfirmation for a User', () => {
-      throw Error('Not implemented');
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      const beforeDate = new Date();
+      const userConfirmation = testNotification.confirmForUser({
+        userId: testUser.id,
+      });
+      const afterDate = new Date();
+
+      expect(userConfirmation).toBeInstanceOf(UserConfirmation);
+      expect(userConfirmation.confirmedBy).toEqual(testUser);
+      expect(userConfirmation.confirmedAt.getTime()).toBeGreaterThanOrEqual(
+        beforeDate.getTime(),
+      );
+      expect(userConfirmation.confirmedAt.getTime()).toBeLessThanOrEqual(
+        afterDate.getTime(),
+      );
+      expect(testNotification.userConfirmation).toEqual(userConfirmation);
     });
 
     it('should throw an error when confirmForUser is called with an unknown user', () => {
-      throw Error('Not implemented');
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      expect(() => {
+        testNotification.confirmForUser({ userId: 'unknown-user-id' });
+      }).toThrow(UserNotFoundError);
+      expect(() => {
+        testNotification.confirmForUser({ userId: 'unknown-user-id' });
+      }).toThrow('User with id unknown-user-id not found in notification');
     });
   });
 
