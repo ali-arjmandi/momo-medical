@@ -6,7 +6,7 @@ import { Organization } from './Organization';
 import { User } from './User';
 import { UserConfirmation } from './UserConfirmation';
 import { UserDevice } from './UserDevice';
-import { UserNotFoundError } from './errors';
+import { EventSourceMismatchError, UserNotFoundError } from './errors';
 
 describe('Notification', () => {
   const testOrganization = new Organization('organization-1', true);
@@ -298,15 +298,85 @@ describe('Notification', () => {
 
   describe('confirmForEvent', () => {
     it('should create a new AutoConfirmation for a LocationEvent', () => {
-      throw Error('Not implemented');
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      const confirmingEvent = new LocationEvent(
+        'wall-button-20',
+        new Date().valueOf(),
+      );
+
+      const beforeDate = new Date();
+      const autoConfirmation = testNotification.confirmForEvent(confirmingEvent);
+      const afterDate = new Date();
+
+      expect(autoConfirmation).toBeInstanceOf(AutoConfirmation);
+      expect(autoConfirmation.confirmedBy).toEqual(confirmingEvent);
+      expect(autoConfirmation.confirmedAt.getTime()).toBeGreaterThanOrEqual(
+        beforeDate.getTime(),
+      );
+      expect(autoConfirmation.confirmedAt.getTime()).toBeLessThanOrEqual(
+        afterDate.getTime(),
+      );
+      expect(testNotification.autoConfirmation).toEqual(autoConfirmation);
     });
 
     it('should return an existing AutoConfirmation when an event is confirmed twice', () => {
-      throw Error('Not implemented');
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      const confirmingEvent1 = new LocationEvent(
+        'wall-button-20',
+        new Date().valueOf(),
+      );
+      const confirmingEvent2 = new LocationEvent(
+        'wall-button-20',
+        new Date().valueOf() + 1000,
+      );
+
+      const firstConfirmation = testNotification.confirmForEvent(confirmingEvent1);
+      const secondConfirmation = testNotification.confirmForEvent(confirmingEvent2);
+
+      expect(secondConfirmation).toBe(firstConfirmation);
+      expect(testNotification.autoConfirmation).toBe(firstConfirmation);
     });
 
     it('should throw an error when confirmForEvent is called with an event that has a different source', () => {
-      throw Error('Not implemented');
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      const differentSourceEvent = new LocationEvent(
+        'different-button',
+        new Date().valueOf(),
+      );
+
+      expect(() => {
+        testNotification.confirmForEvent(differentSourceEvent);
+      }).toThrow(EventSourceMismatchError);
+      expect(() => {
+        testNotification.confirmForEvent(differentSourceEvent);
+      }).toThrow('Event source mismatch: expected wall-button-20, but got different-button');
     });
   });
 });
