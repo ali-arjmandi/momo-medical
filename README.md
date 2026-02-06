@@ -106,6 +106,7 @@ Flow for publishing notifications to message queues:
 
 ## Project Structure
 
+```
 src/
 ├── domain/ # Domain Layer
 │ ├── errors/ # Domain-specific errors
@@ -119,6 +120,7 @@ src/
 └── infrastructure/ # Infrastructure Layer
 ├── repositories/ # Data access
 └── services/ # External service interfaces
+```
 
 
 ## Setup Instructions
