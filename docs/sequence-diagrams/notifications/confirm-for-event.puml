@@ -1,0 +1,72 @@
+@startuml
+title POST /notifications/:id/confirm-for-event - Event-based Auto-Confirmation Flow
+
+actor Client
+participant "Express App" as App
+participant "Repository" as Repo
+participant "Notification" as Notif
+participant "LocationEvent" as Event
+
+Client -> App: POST /notifications/:id/confirm-for-event\n{ event: { source, timestamp } }
+activate App
+
+App -> App: Validate event in request body
+
+alt event missing
+  App --> Client: 400 Bad Request\n{ error: "event is required" }
+  deactivate App
+else event.source or event.timestamp missing
+  App --> Client: 400 Bad Request\n{ error: "event must have source and timestamp" }
+  deactivate App
+else event valid
+  App -> Repo: get(notificationId)
+  activate Repo
+  
+  alt Notification not found
+    Repo --> App: NotificationNotFoundError
+    deactivate Repo
+    App --> Client: 404 Not Found\n{ error }
+    deactivate App
+  else Notification found
+    Repo --> App: notification
+    deactivate Repo
+    
+    App -> Event: new LocationEvent(source, timestamp)
+    activate Event
+    Event --> App: confirmingEvent
+    deactivate Event
+    
+    App -> Notif: confirmForEvent(confirmingEvent)
+    activate Notif
+    
+    Notif -> Notif: Check event.source === notification.event.source
+    
+    alt Event source mismatch
+      Notif --> App: EventSourceMismatchError
+      deactivate Notif
+      App --> Client: 400 Bad Request\n{ error }
+      deactivate App
+    else Event source matches
+      alt AutoConfirmation already exists
+        Notif -> Notif: Return existing autoConfirmation
+        Notif --> App: existing autoConfirmation
+      else No AutoConfirmation
+        Notif -> Notif: Create AutoConfirmation\n(confirmedAt: new Date(),\n confirmedBy: event)
+        Notif -> Notif: Store in autoConfirmation
+        Notif --> App: new autoConfirmation
+      end
+      deactivate Notif
+      
+      App -> Repo: update(notification)
+      activate Repo
+      Repo --> App: updated notification
+      deactivate Repo
+      
+      App -> App: Format response\n(confirmedAt: ISO string,\n confirmedBy: { source, timestamp })
+      App --> Client: 200 OK\n{ autoConfirmation: {...} }
+      deactivate App
+    end
+  end
+end
+
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+title GET /notifications - Retrieve All Notifications
+
+actor Client
+participant "Express App" as App
+participant "Repository" as Repo
+participant "Notification" as Notif
+
+Client -> App: GET /notifications
+activate App
+
+App -> Repo: list()
+activate Repo
+Repo --> App: notifications[]
+deactivate Repo
+
+loop For each notification
+  App -> Notif: toJSON()
+  activate Notif
+  Notif -> Notif: Convert to JSON format
+  Notif --> App: notificationJSON
+  deactivate Notif
+end
+
+App --> Client: 200 OK\n{ notifications: [...] }
+deactivate App
+
+@enduml

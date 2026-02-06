@@ -1,0 +1,23 @@
+@startuml
+title Notification Publishing Flow
+
+participant "Notification" as Notif
+participant "Publisher" as Pub
+
+Notif -> Notif: publish()
+activate Notif
+
+Notif -> Notif: toJSON()
+Notif -> Notif: Convert to JSON format\n(includes all fields,\nserializes dates to ISO strings)
+
+Notif -> Notif: JSON.stringify(notificationJSON)
+
+Notif -> Pub: publish(jsonMessage)
+activate Pub
+Note right of Pub: Publishes notification JSON\nto message queue/topic
+Pub --> Notif: success
+deactivate Pub
+
+deactivate Notif
+
+@enduml

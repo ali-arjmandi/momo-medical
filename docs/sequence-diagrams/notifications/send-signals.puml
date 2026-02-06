@@ -1,0 +1,78 @@
+@startuml
+title Notification Signal Sending Logic - Detailed Flow
+
+participant "Notification" as Notif
+participant "Organization" as Org
+participant "Bed" as Bed
+participant "User" as User
+participant "UserDevice" as Device
+participant "SignalSender" as Signal
+
+== Signal Sending Process ==
+
+Notif -> Notif: sendSignals()
+activate Notif
+
+Notif -> Org: Check notificationsEnabled
+
+alt Organization notifications disabled
+  Notif -> Notif: Return early (no signals sent)
+  deactivate Notif
+else Organization notifications enabled
+  Notif -> Bed: Check notificationsEnabled
+  
+  alt Bed notifications disabled
+    Notif -> Notif: Return early (no signals sent)
+    deactivate Notif
+  else Bed notifications enabled
+    Notif -> Notif: Initialize enabledDevices[] = []
+    
+    loop For each User in notification.users
+      Notif -> User: hasDisabledWard({ ward: bed.ward })
+      activate User
+      User --> Notif: true/false
+      deactivate User
+      
+      alt User has ward disabled
+        Notif -> Notif: Skip user (continue)
+      else User has ward enabled
+        loop For each UserDevice in user.userDevices
+          Notif -> Device: Check notificationsEnabled
+          activate Device
+          Device --> Notif: true/false
+          deactivate Device
+          
+          alt Device notifications disabled
+            Notif -> Notif: Skip device (continue)
+          else Device notifications enabled
+            Notif -> Notif: Add device to enabledDevices[]
+          end
+        end
+      end
+    end
+    
+    alt enabledDevices.length > 0
+      Notif -> Signal: sendSignal(message, enabledDevices)
+      activate Signal
+      Note right of Signal: Sends notification to all\nenabled devices at once
+      Signal --> Notif: success
+      deactivate Signal
+    else No enabled devices
+      Notif -> Notif: No signals sent (no eligible devices)
+    end
+    
+    deactivate Notif
+  end
+end
+
+== Summary of Conditions ==
+
+note right of Notif
+  Signals are sent ONLY if ALL conditions are met:
+  1. Organization.notificationsEnabled = true
+  2. Bed.notificationsEnabled = true
+  3. User.enabledWards includes bed.ward
+  4. UserDevice.notificationsEnabled = true
+end note
+
+@enduml
