@@ -1,7 +1,7 @@
 import { AutoConfirmation } from './AutoConfirmation';
 import { type Bed } from './Bed';
 import { type LocationEvent } from './LocationEvent';
-import { type Organisation } from './Organisation';
+import { type Organization } from './Organization';
 import { type User } from './User';
 import { UserConfirmation } from './UserConfirmation';
 import { type IPublisher } from '../infrastructure/services/IPublisher';
@@ -10,7 +10,7 @@ import { type ISignalSender } from '../infrastructure/services/ISignalSender';
 interface NotificationParams {
   id: string;
   bed: Bed;
-  organisation: Organisation;
+  organization: Organization;
   users: User[];
   event: LocationEvent;
   signalSender: ISignalSender;
@@ -22,7 +22,7 @@ interface NotificationParams {
 export class Notification {
   public readonly id: string;
   public readonly bed: Bed;
-  public readonly organisation: Organisation;
+  public readonly organization: Organization;
   public readonly users: User[];
   public readonly event: LocationEvent;
   public userConfirmation?: UserConfirmation;
@@ -35,7 +35,7 @@ export class Notification {
   constructor({
     id,
     bed,
-    organisation,
+    organization,
     users,
     event,
     userConfirmation,
@@ -45,7 +45,7 @@ export class Notification {
   }: NotificationParams) {
     this.id = id;
     this.bed = bed;
-    this.organisation = organisation;
+    this.organization = organization;
     this.users = users;
     this.event = event;
     this.signalSender = signalSender;

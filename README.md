@@ -13,7 +13,7 @@ In order to send an alert to nurses, a lot of information is needed to make sure
 This data is contained in the following domain objects:
 
 - Notification
-- Organisation
+- Organization
 - Bed
 - User
 - UserDevice

@@ -4,12 +4,12 @@ import { Bed } from '../domain/Bed';
 import { InMemoryNotificationRepository } from '../infrastructure/repositories/InMemoryNotificationRepository';
 import { LocationEvent } from '../domain/LocationEvent';
 import { Notification } from '../domain/Notification';
-import { Organisation } from '../domain/Organisation';
+import { Organization } from '../domain/Organization';
 import { User } from '../domain/User';
 import { UserDevice } from '../domain/UserDevice';
 
 describe('app', () => {
-  const testOrganisation = new Organisation('organisation-1', true);
+  const testOrganization = new Organization('organization-1', true);
   const testBed = new Bed('bed-1', 'Bed 1', 'Ward 1', true);
   const testUserDevice = new UserDevice(true);
   const testUser = new User('user-1', ['Ward 1'], [testUserDevice]);
@@ -35,7 +35,7 @@ describe('app', () => {
     it('should return all notifications', async () => {
       const testNotification = new Notification({
         id: '1',
-        organisation: testOrganisation,
+        organization: testOrganization,
         bed: testBed,
         users: [testUser],
         event: testEvent,
@@ -64,7 +64,7 @@ describe('app', () => {
     it('should confirm a Notification and receive a UserConfirmation', async () => {
       const testNotification = new Notification({
         id: '1',
-        organisation: testOrganisation,
+        organization: testOrganization,
         bed: testBed,
         users: [testUser],
         event: testEvent,
@@ -97,7 +97,7 @@ describe('app', () => {
     it('should confirm a Notification and receive an AutoConfirmation', async () => {
       const testNotification = new Notification({
         id: '1',
-        organisation: testOrganisation,
+        organization: testOrganization,
         bed: testBed,
         users: [testUser],
         event: testEvent,

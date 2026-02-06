@@ -1,12 +1,12 @@
 import { Bed } from './Bed';
 import { LocationEvent } from './LocationEvent';
 import { Notification } from './Notification';
-import { Organisation } from './Organisation';
+import { Organization } from './Organization';
 import { User } from './User';
 import { UserDevice } from './UserDevice';
 
 describe('Notification', () => {
-  const testOrganisation = new Organisation('organisation-1', true);
+  const testOrganization = new Organization('organization-1', true);
   const testBed = new Bed('bed-1', 'Bed 1', 'Ward 1', true);
   const testUserDevice = new UserDevice(true);
   const testUser = new User('user-1', ['Ward 1'], [testUserDevice]);
@@ -31,7 +31,7 @@ describe('Notification', () => {
     const id = 'notification-1';
     const testNotification = new Notification({
       id,
-      organisation: testOrganisation,
+      organization: testOrganization,
       bed: testBed,
       users: [testUser],
       event: testEvent,
@@ -42,7 +42,7 @@ describe('Notification', () => {
     expect(testNotification).toBeInstanceOf(Notification);
     expect(testNotification.id).toEqual(id);
     expect(testNotification.bed).toEqual(testBed);
-    expect(testNotification.organisation).toEqual(testOrganisation);
+    expect(testNotification.organization).toEqual(testOrganization);
     expect(testNotification.users).toEqual([testUser]);
     expect(testNotification.event).toEqual(testEvent);
   });
@@ -58,7 +58,7 @@ describe('Notification', () => {
       throw Error('Not implemented');
     });
 
-    it('should send no signals when the Organisation has notifications disabled', () => {
+    it('should send no signals when the Organization has notifications disabled', () => {
       throw Error('Not implemented');
     });
 

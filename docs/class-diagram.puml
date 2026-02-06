@@ -2,7 +2,7 @@
 class Notification {
   +id: string
   +bed: Bed
-  +organisation: Organisation
+  +organization: Organization
   +users: User[]
   +event: LocationEvent
   +userConfirmation?: UserConfirmation
@@ -16,7 +16,7 @@ class Notification {
   +confirmForEvent(event: LocationEvent): AutoConfirmation
 }
 
-class Organisation {
+class Organization {
   +id: string
   +notificationsEnabled: boolean
 }
@@ -63,7 +63,7 @@ interface IPublisher {
 }
 
 ' Relationships
-Notification "1" --> "1" Organisation : has
+Notification "1" --> "1" Organization : has
 Notification "1" --> "1" Bed : has
 Notification "1" --> "*" User : notifies
 Notification "1" --> "1" LocationEvent : triggered by
