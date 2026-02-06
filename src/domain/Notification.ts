@@ -5,6 +5,7 @@ import { type Organization } from './Organization';
 import { type User } from './User';
 import { type UserDevice } from './UserDevice';
 import { UserConfirmation } from './UserConfirmation';
+import { UserNotFoundError } from './errors';
 import { type IPublisher } from '../infrastructure/services/IPublisher';
 import { type ISignalSender } from '../infrastructure/services/ISignalSender';
 
@@ -134,8 +135,18 @@ export class Notification {
     };
   }
 
-  // @ts-expect-error Remove this once the method is implemented
-  confirmForUser({}: { userId: string }): UserConfirmation {}
+  confirmForUser({ userId }: { userId: string }): UserConfirmation {
+    const user = this.users.find((u) => u.id === userId);
+
+    if (!user) {
+      throw new UserNotFoundError(userId);
+    }
+
+    const userConfirmation = new UserConfirmation(new Date(), user);
+    this.userConfirmation = userConfirmation;
+
+    return userConfirmation;
+  }
 
   // @ts-expect-error Remove this once the method is implemented
   confirmForEvent(_event: LocationEvent): AutoConfirmation {}
