@@ -1,1 +1,1 @@
-class NotificationNotFoundError extends Error {}
+export class NotificationNotFoundError extends Error {}
