@@ -1,8 +1,10 @@
+import { AutoConfirmation } from './AutoConfirmation';
 import { Bed } from './Bed';
 import { LocationEvent } from './LocationEvent';
 import { Notification } from './Notification';
 import { Organization } from './Organization';
 import { User } from './User';
+import { UserConfirmation } from './UserConfirmation';
 import { UserDevice } from './UserDevice';
 
 describe('Notification', () => {
@@ -49,7 +51,73 @@ describe('Notification', () => {
 
   describe('toJSON', () => {
     it('should convert a Notification to a correct JSON representation', () => {
-      throw Error('Not implemented');
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      const json = testNotification.toJSON();
+
+      expect(json).toEqual({
+        id: 'notification-1',
+        bed: testBed,
+        organization: testOrganization,
+        users: [testUser],
+        event: testEvent,
+      });
+      expect(json.userConfirmation).toBeUndefined();
+      expect(json.autoConfirmation).toBeUndefined();
+    });
+
+    it('should include userConfirmation when present', () => {
+      const confirmedAt = new Date('2025-05-06T10:00:00Z');
+      const userConfirmation = new UserConfirmation(confirmedAt, testUser);
+
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+        userConfirmation,
+      });
+
+      const json = testNotification.toJSON();
+
+      expect(json.userConfirmation).toEqual({
+        confirmedAt: confirmedAt.toISOString(),
+        confirmedBy: testUser,
+      });
+    });
+
+    it('should include autoConfirmation when present', () => {
+      const confirmedAt = new Date('2025-05-06T10:00:00Z');
+      const autoConfirmation = new AutoConfirmation(confirmedAt, testEvent);
+
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+        autoConfirmation,
+      });
+
+      const json = testNotification.toJSON();
+
+      expect(json.autoConfirmation).toEqual({
+        confirmedAt: confirmedAt.toISOString(),
+        confirmedBy: testEvent,
+      });
     });
   });
 

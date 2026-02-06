@@ -19,6 +19,22 @@ interface NotificationParams {
   autoConfirmation?: AutoConfirmation;
 }
 
+export interface NotificationJSON {
+  id: string;
+  bed: Bed;
+  organization: Organization;
+  users: User[];
+  event: LocationEvent;
+  userConfirmation?: {
+    confirmedAt: string;
+    confirmedBy: User;
+  };
+  autoConfirmation?: {
+    confirmedAt: string;
+    confirmedBy: LocationEvent;
+  };
+}
+
 export class Notification {
   public readonly id: string;
   public readonly bed: Bed;
@@ -64,7 +80,27 @@ export class Notification {
 
   async publish() {}
 
-  toJSON() {}
+  toJSON(): NotificationJSON {
+    return {
+      id: this.id,
+      bed: this.bed,
+      organization: this.organization,
+      users: this.users,
+      event: this.event,
+      ...(this.userConfirmation && {
+        userConfirmation: {
+          confirmedAt: this.userConfirmation.confirmedAt.toISOString(),
+          confirmedBy: this.userConfirmation.confirmedBy,
+        },
+      }),
+      ...(this.autoConfirmation && {
+        autoConfirmation: {
+          confirmedAt: this.autoConfirmation.confirmedAt.toISOString(),
+          confirmedBy: this.autoConfirmation.confirmedBy,
+        },
+      }),
+    };
+  }
 
   // @ts-expect-error Remove this once the method is implemented
   confirmForUser({}: { userId: string }): UserConfirmation {}
