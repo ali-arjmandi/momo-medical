@@ -3,6 +3,7 @@ import { type Bed } from './Bed';
 import { type LocationEvent } from './LocationEvent';
 import { type Organization } from './Organization';
 import { type User } from './User';
+import { type UserDevice } from './UserDevice';
 import { UserConfirmation } from './UserConfirmation';
 import { type IPublisher } from '../infrastructure/services/IPublisher';
 import { type ISignalSender } from '../infrastructure/services/ISignalSender';
@@ -43,7 +44,6 @@ export class Notification {
   public readonly event: LocationEvent;
   public userConfirmation?: UserConfirmation;
   public autoConfirmation?: AutoConfirmation;
-  // @ts-expect-error Remove this once the member is used in a method
   private readonly signalSender: ISignalSender;
   // @ts-expect-error Remove this once the member is used in a method
   private readonly publisher: IPublisher;
@@ -76,7 +76,36 @@ export class Notification {
    * @throws {Error} If signal sender is not set
    * @throws {Error} If sending signal fails
    */
-  async sendSignals() {}
+  async sendSignals() {
+    if (!this.organization.notificationsEnabled) {
+      return;
+    }
+
+    if (!this.bed.notificationsEnabled) {
+      return;
+    }
+
+    const enabledDevices: UserDevice[] = [];
+
+    for (const user of this.users) {
+      if (user.hasDisabledWard({ ward: this.bed.ward })) {
+        continue;
+      }
+
+      for (const device of user.userDevices) {
+        if (device.notificationsEnabled) {
+          enabledDevices.push(device);
+        }
+      }
+    }
+
+    if (enabledDevices.length > 0) {
+      await this.signalSender.sendSignal(
+        `Notification for bed ${this.bed.name} in ${this.bed.ward}`,
+        enabledDevices,
+      );
+    }
+  }
 
   async publish() {}
 
