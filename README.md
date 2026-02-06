@@ -1,81 +1,107 @@
-# Hiring Assignment
+# Nurse Call System - Technical Assignment
 
-Welcome to the Momo hiring assignment! You are tasked with implementing some basic functionality for a Nurse Call System.
-This system is responsible for sending alerts to nurses when residents of a nursing home need assistance.
-Some functionality is still missing, and you are expected to implement it.
+## Introduction
 
-During this assignment, it is important to make sure all code is versioned. Therefore: make sure to commit your code often!
-Start off by setting up `git` by running `git init`.
+This project is a **Nurse Call System** implementation completed as part of a technical assessment. The system is designed to send alerts to nurses when residents of a nursing home need assistance, ensuring that notifications reach the correct users and devices based on various configuration settings.
 
-## Part 1—Modeling
+### What This System Does
 
-In order to send an alert to nurses, a lot of information is needed to make sure that Notifications end up at the correct users and the correct phones.
-This data is contained in the following domain objects:
+The Nurse Call System handles:
+- **Notification Management**: Creating and managing notifications for nursing home residents
+- **Smart Signal Routing**: Intelligently routing notifications to nurses based on:
+  - Organization-level notification settings
+  - Bed-specific notification preferences
+  - User ward assignments
+  - Individual device notification settings
+- **Confirmation Tracking**: Supporting both manual user confirmations and automatic event-based confirmations
+- **Event Publishing**: Publishing notifications to message queues for downstream processing
 
-- Notification
-- Organization
-- Bed
-- User
-- UserDevice
-- UserConfirmation
-- AutoConfirmation
+### Architecture Overview
 
-Your first task is to map out all the relationships between these objects and create a class diagram. You can use any tool you like to create the diagram.
-Make sure to commit your diagram to the assignment.
+The application follows a **layered architecture** (Domain-Driven Design approach) with clear separation of concerns:
 
-## Part 2—Structuring
+- **Domain Layer**: Core business logic and entities (Notification, User, Bed, Organization, etc.)
+- **Application Layer**: HTTP endpoints and request/response handling (Express.js)
+- **Infrastructure Layer**: Repository implementations and external service interfaces
 
-Now that you have a better understanding of the domain, you can start structuring the code.
-The `src` folder contains all the source files belonging to this application, but it is currently unstructured.
-Reorganize the files in appropriate folders using a layered architecture approach.
+## System Architecture
 
-## Part 3—Implementing
+### Domain Model
 
-The Notification entity is missing functionality outlined in the `src/Notification.spec.ts` file. Using Test-Driven Development,
-you are expected to implement the missing functionality.
+The following class diagram illustrates the relationships between all domain entities:
 
-## Part 4—Integrating
+![Domain Model Class Diagram](./docs/class-diagram.png)
 
-In order to get the application to work, you need to extend the domain layer with an application layer.
-Using the existing integration tests in `src/app.spec.ts` you are expected to implement the missing functionality.
-In order to achieve this, you should use Express to implement the endpoints.
+### Application Flows
 
-## Part 5—Documenting
+The system supports several key workflows, each documented with sequence diagrams:
 
-Now that you have a good understanding of what the application is supposed to do, make a sequence diagram of the application logic.
+#### 1. Retrieving Notifications
 
-## Part 6—Wrapping up
+Flow for retrieving all notifications via the GET endpoint:
 
-The application should now be fully up and running. Make sure that all your code and diagrams are committed,
-and check if the tests still work with `yarn test`.
+![Get Notifications Flow](./docs/sequence-diagrams/notifications/get-notifications.png)
 
-# Additional information
+#### 2. User Confirmation
 
-## Evaluation rubric
-The evaluation rubric is available in the [EVALUATION.md](EVALUATION.md) file.
+Flow for when a nurse manually confirms a notification:
 
-## Use of AI
+![User Confirmation Flow](./docs/sequence-diagrams/notifications/confirm-for-user.png)
 
-During this assignment the use of code assistance using LLMs is allowed but definitely not required.
-We expect you to use your own knowledge and skills to complete the assignment.
+#### 3. Event-based Auto-Confirmation
 
-## Setup Instructions
+Flow for automatic confirmation based on location events:
 
-1. Unzip the assignment.
-2. Install node 20.0.0 or later.
-3. Enable `corepack`: `corepack enable`
-4. Install dependencies: `yarn`
+![Event Confirmation Flow](./docs/sequence-diagrams/notifications/confirm-for-event.png)
 
-## Running the tests
+#### 4. Signal Sending Logic
 
-Run the tests with `yarn test`.
+Detailed flow showing how notifications are filtered and sent to user devices:
 
-## Making a new release
+![Signal Sending Logic](./docs/sequence-diagrams/notifications/send-signals.png)
 
-(only relevant for assignment maintainers)
+#### 5. Notification Publishing
 
-- Prepare the assignment by checking out the reference solution and modifying it so that it is a good starting point for the candidate.
-- Commit the assignment starting point
-- Create a new tag that starts with `assignment/` (for example: `assignment/1.0.0`)
-- Push the tag
-- A release with a zipped code assignment will be created
+Flow for publishing notifications to message queues:
+
+![Publishing Flow](./docs/sequence-diagrams/notifications/publish.png)
+
+## Implementation Summary
+
+### Completed Features
+
+✅ **Domain Layer**
+- Implemented all Notification entity methods:
+  - `toJSON()` - Serialization to JSON format
+  - `sendSignals()` - Intelligent signal routing with multi-level filtering
+  - `publish()` - Publishing to message queues
+  - `confirmForUser()` - User confirmation with validation
+  - `confirmForEvent()` - Event-based confirmation with source matching
+
+✅ **Application Layer**
+- Implemented REST API endpoints:
+  - `GET /notifications` - Retrieve all notifications
+  - `POST /notifications/:id/confirm-for-user` - User confirmation
+  - `POST /notifications/:id/confirm-for-event` - Event-based confirmation
+- Comprehensive error handling (404, 400, 500)
+- Request validation
+
+✅ **Architecture**
+- Organized code into layered architecture (Domain, Application, Infrastructure)
+- Proper separation of concerns
+- Dependency inversion principles
+
+✅ **Documentation**
+- Class diagram showing domain relationships
+- Sequence diagrams for all application flows
+- Error handling with custom domain errors
+
+### Technical Highlights
+
+- **Test-Driven Development**: All features implemented following TDD principles
+- **Type Safety**: Full TypeScript implementation with proper type definitions
+- **Error Handling**: Custom domain errors (UserNotFoundError, EventSourceMismatchError, NotificationNotFoundError)
+- **In-Memory Storage**: Repository pattern with in-memory implementation for testing
+- **Signal Filtering**: Multi-level filtering (Organization → Bed → User Ward → Device)
+
+## Project Structure
