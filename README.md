@@ -105,3 +105,34 @@ Flow for publishing notifications to message queues:
 - **Signal Filtering**: Multi-level filtering (Organization → Bed → User Ward → Device)
 
 ## Project Structure
+
+src/
+├── domain/ # Domain Layer
+│ ├── errors/ # Domain-specific errors
+│ ├── Notification.ts # Core notification entity
+│ ├── User.ts
+│ ├── Bed.ts
+│ └── ...
+├── application/ # Application Layer
+│ ├── app.ts # Express application setup
+│ └── app.spec.ts # Integration tests
+└── infrastructure/ # Infrastructure Layer
+├── repositories/ # Data access
+└── services/ # External service interfaces
+
+
+## Setup Instructions
+
+1. Install Node.js 20.0.0 or later
+2. Enable corepack: `corepack enable`
+3. Install dependencies: `yarn`
+4. Run tests: `yarn test`
+5. Start the server: `yarn start` (runs on port 3000)
+
+## Running the Application
+
+# Run all tests
+yarn test
+
+# Start the development server
+yarn start
