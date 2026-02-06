@@ -1,0 +1,78 @@
+@startuml
+class Notification {
+  +id: string
+  +bed: Bed
+  +organisation: Organisation
+  +users: User[]
+  +event: LocationEvent
+  +userConfirmation?: UserConfirmation
+  +autoConfirmation?: AutoConfirmation
+  -signalSender: ISignalSender
+  -publisher: IPublisher
+  +sendSignals(): Promise<void>
+  +publish(): Promise<void>
+  +toJSON(): object
+  +confirmForUser(userId: string): UserConfirmation
+  +confirmForEvent(event: LocationEvent): AutoConfirmation
+}
+
+class Organisation {
+  +id: string
+  +notificationsEnabled: boolean
+}
+
+class Bed {
+  +id: string
+  +name: string
+  +ward: string
+  +notificationsEnabled: boolean
+}
+
+class User {
+  +id: string
+  +enabledWards: string[]
+  +userDevices: UserDevice[]
+  +hasDisabledWard(ward: string): boolean
+}
+
+class UserDevice {
+  +notificationsEnabled: boolean
+}
+
+class UserConfirmation {
+  +confirmedAt: Date
+  +confirmedBy: User
+}
+
+class AutoConfirmation {
+  +confirmedAt: Date
+  +confirmedBy: LocationEvent
+}
+
+class LocationEvent {
+  +source: string
+  +timestamp: number
+}
+
+interface ISignalSender {
+  +sendSignal(message: string, targets: UserDevice[]): Promise<void>
+}
+
+interface IPublisher {
+  +publish(message: string): Promise<void>
+}
+
+' Relationships
+Notification "1" --> "1" Organisation : has
+Notification "1" --> "1" Bed : has
+Notification "1" --> "*" User : notifies
+Notification "1" --> "1" LocationEvent : triggered by
+Notification "1" --> "0..1" UserConfirmation : has
+Notification "1" --> "0..1" AutoConfirmation : has
+Notification ..> ISignalSender : uses
+Notification ..> IPublisher : uses
+
+User "1" --> "*" UserDevice : has
+UserConfirmation "1" --> "1" User : confirmed by
+AutoConfirmation "1" --> "1" LocationEvent : confirmed by
+@enduml
