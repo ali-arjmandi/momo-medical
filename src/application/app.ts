@@ -6,13 +6,17 @@ interface ApplicationParameters {
 }
 
 export function createApp(
-  _parameters: ApplicationParameters,
+  parameters: ApplicationParameters,
 ): express.Application {
   const app = express();
   app.use(express.json());
 
   app.get('/notifications', async (_req, res) => {
-    res.status(500).send('Not implemented');
+    const notifications = await parameters.notificationRepository.list();
+    const notificationsJson = notifications.map((notification) =>
+      notification.toJSON(),
+    );
+    res.json({ notifications: notificationsJson });
   });
 
   app.post(
