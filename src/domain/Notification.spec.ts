@@ -219,8 +219,30 @@ describe('Notification', () => {
   });
 
   describe('publish', () => {
-    it('should publish the notification to the publisher topic', () => {
-      throw Error('Not implemented');
+    it('should publish the notification to the publisher topic', async () => {
+      const testNotification = new Notification({
+        id: 'notification-1',
+        organization: testOrganization,
+        bed: testBed,
+        users: [testUser],
+        event: testEvent,
+        signalSender,
+        publisher,
+      });
+
+      await testNotification.publish();
+
+      expect(publisher.publish).toHaveBeenCalledTimes(1);
+      const publishedMessage = JSON.parse(
+        (publisher.publish as jest.Mock).mock.calls[0][0],
+      );
+      expect(publishedMessage).toEqual({
+        id: 'notification-1',
+        bed: testBed,
+        organization: testOrganization,
+        users: [testUser],
+        event: testEvent,
+      });
     });
   });
 

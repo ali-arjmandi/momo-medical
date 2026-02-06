@@ -45,7 +45,6 @@ export class Notification {
   public userConfirmation?: UserConfirmation;
   public autoConfirmation?: AutoConfirmation;
   private readonly signalSender: ISignalSender;
-  // @ts-expect-error Remove this once the member is used in a method
   private readonly publisher: IPublisher;
 
   constructor({
@@ -107,7 +106,11 @@ export class Notification {
     }
   }
 
-  async publish() {}
+  async publish() {
+    const notificationJson = this.toJSON();
+    const message = JSON.stringify(notificationJson);
+    await this.publisher.publish(message);
+  }
 
   toJSON(): NotificationJSON {
     return {
